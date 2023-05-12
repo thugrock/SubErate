@@ -2,12 +2,7 @@
 - name: Pull and Run docker image of SubErate
   hosts: all
   tasks:
-    - name: Pull Docker image
-      docker_image:
-        name: suberate
-        state: present
-        source: dockerhub
-        repository: thugrock/suberate
-        tag: latest
+    - name: pull docker image
+      shell: docker pull thugrock/suberate:latest
     - name: run docker image and run tests
       shell: docker run -p 8501:8501 -td --rm thugrock/suberate
