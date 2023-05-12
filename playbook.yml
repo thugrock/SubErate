@@ -16,10 +16,5 @@
         image_name: suberate
         image_tag: latest
         gcr_image: "{{ registry }}/{{ project_id }}/{{ image_name }}:{{ image_tag }}"
-      docker_image:
-        name: thugrock/suberate
-        repository: "{{ gcr_image }}"
-        state: present
-        source: pull
-        tag: "{{ image_tag }}"
-        api_version: auto
+      shell: docker tag thugrock/suberate:latest {{ gcr_image }} && docker push {{ gcr_image }}
+
