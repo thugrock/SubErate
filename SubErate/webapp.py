@@ -5,12 +5,38 @@ import ffmpeg
 import streamlit as st
 from typing import List, Dict
 import whisper
+import base64
+import pytube
 import time
 import io
 import sys
 from cli import get_audio, get_subtitles
 
 os.environ["WHISPER_MODELS_DIR"] = "./models"
+
+# Define a function to download a file
+def download_file(file_path):
+    with open(file_path, "rb") as f:
+        file_bytes = f.read()
+    b64 = base64.b64encode(file_bytes).decode()
+    href = f'<a href="data:application/octet-stream;base64,{b64}" download="{file_path}">Download File</a>'
+    return href
+
+def download_video(url, resolution):
+    try:
+        # Create a YouTube object
+        youtube = pytube.YouTube(url)
+
+        # Get the stream with the desired resolution
+        video_stream = youtube.streams.filter(progressive=True, file_extension='mp4', resolution=resolution).first()
+
+        # Get the filename and download the video
+        filename = video_stream.default_filename
+        video_stream.download(output_path="./uploads")
+
+        return filename
+    except Exception as e:
+        st.error(f'Error: {e}')
 
 # Define a custom stream class that redirects writes to sys.stdout to the Streamlit app
 class StreamToSt:
@@ -66,11 +92,24 @@ def generate_subtitled_video(video_paths: List[str], model_name: str, output_dir
 
         st.write(f"Saved subtitled video to {os.path.abspath(out_path)}.")
 
+        # Display the video player
+        st.video(out_path)
+
+        # Display the download button
+        st.markdown(download_file(out_path), unsafe_allow_html=True)
+
 
 def main():
     st.set_page_config(page_title="Subtitled Video Generator")
 
     st.header("Subtitled Video Generator")
+
+    # Create input box for YouTube URL
+    youtube_url = st.text_input("Enter a YouTube URL:")
+
+    # Create select box for video resolution
+    resolutions = ['360p', '480p', '720p', '1080p']
+    selected_resolution = st.selectbox("Select the desired resolution:", resolutions)
 
     video_paths = st.file_uploader("Select video file(s)", type=["mp4", "avi", "mkv"], accept_multiple_files=True)
     video_full_paths = []
@@ -84,6 +123,10 @@ def main():
                 f.write(uploaded_file.getbuffer())
 
             video_full_paths.append(temp_file_path)
+    # Download YouTube video if URL is provided
+    if youtube_url:
+        filename = download_video(youtube_url, selected_resolution)
+        video_full_paths.append(os.path.join("./uploads", filename))
 
     model_name = st.selectbox("Select model to use", whisper.available_models())
 
