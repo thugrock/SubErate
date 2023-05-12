@@ -17,6 +17,7 @@
         image_tag: latest
         gcr_image: "{{ registry }}/{{ project_id }}/{{ image_name }}:{{ image_tag }}"
       docker_image:
+        name: thugrock/suberate
         source: thugrock/suberate
         repository: "{{ gcr_image }}"
         tag: "{{ image_tag }}"
