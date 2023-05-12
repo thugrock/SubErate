@@ -1,4 +1,4 @@
-huggingfface-hub
+huggingface-hub
 transformers
 openai-whisper
 streamlit
