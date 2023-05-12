@@ -16,5 +16,5 @@
         image_name: suberate
         image_tag: latest
         gcr_image: "{{ registry }}/{{ project_id }}/{{ image_name }}:{{ image_tag }}"
-      shell: docker tag thugrock/suberate:latest {{ gcr_image }} && docker push {{ gcr_image }}
+      shell: docker push {{ gcr_image }}
 
