@@ -5,9 +5,6 @@ streamlit
 argparse
 ffmpeg
 typing
-warnings
-os
 translate
 pysrt
-time
 setuptools
