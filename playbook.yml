@@ -1,5 +1,6 @@
 ---
-- hosts:[my_server]
+- name: Pull and Run docker image of SubErate
+  hosts: all
   tasks:
     - name: Pull Docker image
       docker_image:
