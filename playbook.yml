@@ -15,6 +15,7 @@
         registry: gcr.io
         image_name: suberate
         image_tag: latest
-        gcr_image: "{{ registry }}/{{ project_id }}/{{ image_name }}:{{ image_tag }}"
-      shell: docker push {{ gcr_image }}
+        gcr_image: "{{ registry }}/{{ image_name }}:{{ image_tag }}"
+      shell: docker tag thugrock/suberate 'gcr.io/promising-cairn-386312/suberate:latest' && docker push gcr.io/promising-cairn-386312/suberate:latest
+
 
