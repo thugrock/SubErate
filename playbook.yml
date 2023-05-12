@@ -7,15 +7,6 @@
     - name: run docker image and run tests
       shell: docker run -p 8501:8501 -td --rm thugrock/suberate
     - name: tag and push docker image to GCR
-      become: yes
-      environment:
-        GOOGLE_APPLICATION_CREDENTIALS: /var/lib/jenkins/gcp_credentials.json
-      vars:
-        project_id: My First Project
-        registry: gcr.io
-        image_name: suberate
-        image_tag: latest
-        gcr_image: "{{ registry }}/{{ image_name }}:{{ image_tag }}"
       shell: docker tag thugrock/suberate 'gcr.io/promising-cairn-386312/suberate:latest' && docker push gcr.io/promising-cairn-386312/suberate:latest
 
 
