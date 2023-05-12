@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: suberate-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: suberate
+  ports:
+  - port: 8501
+    targetPort: 8501
+    nodePort: 30008
