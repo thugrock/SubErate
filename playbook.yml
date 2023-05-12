@@ -1,0 +1,12 @@
+---
+- hosts:[my_server]
+  tasks:
+    - name: Pull Docker image
+      docker_image:
+        name: suberate
+        state: present
+        source: dockerhub
+        repository: thugrock/suberate
+        tag: latest
+    - name: run docker image and run tests
+      shell: docker run -p 8501:8501 -td --rm thugrock/suberate
