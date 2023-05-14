@@ -7,6 +7,7 @@ from typing import List, Dict
 import whisper
 import base64
 import pytube
+import pysrt
 import time
 import io
 import sys
