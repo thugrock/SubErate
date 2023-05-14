@@ -135,7 +135,7 @@ def main():
     if video_paths is not None:
         for uploaded_file in video_paths:
             # Create a temporary file path
-            temp_file_path = os.path.join(os.getcwd(), 'uploads', uploaded_file.name)
+            temp_file_path = os.path.join(os.getcwd(), 'uploads')
 
             # Save the uploaded file data to the temporary file
             with open(temp_file_path, "wb") as f:
