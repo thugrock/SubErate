@@ -13,6 +13,18 @@ import sys
 from cli import get_audio, get_subtitles
 
 os.environ["WHISPER_MODELS_DIR"] = "./models"
+def translate_subtitle(subtitle_path, target_lang):
+    # Load subtitle file
+    subs = pysrt.open(subtitle_path)
+    # Initialize translator
+    translator = Translator(to_lang=target_lang)
+    # Translate each subtitle and update the text
+    for sub in subs:
+        sub.text = translator.translate(sub.text)
+    # Save the translated subtitle as a new file
+    output_path = f"{subtitle_path.split('.')[0]}_{target_lang}.srt"
+    subs.save(output_path, encoding='utf-8')
+    return output_path
 
 # Define a function to download a file
 def download_file(file_path):
@@ -32,7 +44,7 @@ def download_video(url, resolution):
 
         # Get the filename and download the video
         filename = video_stream.default_filename
-        video_stream.download(output_path="./uploads")
+        video_stream.download(output_path=os.getcwd()+"/uploads")
 
         return filename
     except Exception as e:
@@ -47,7 +59,7 @@ class StreamToSt:
         self.app.text(text)
 
 
-def generate_subtitled_video(video_paths: List[str], model_name: str, output_dir: str, output_srt: bool, srt_only: bool, verbose: bool, task: str = "translate"):
+def generate_subtitled_video(video_paths: List[str], model_name: str, output_dir: str, output_srt: bool, srt_only: bool, verbose: bool, target_lang: str = "en", task: str = "translate"):
 
     def transcribe_with_progress(model, audio_path,  **args):
         # Transcribe audio and update progress bar as transcription proceeds
@@ -85,9 +97,10 @@ def generate_subtitled_video(video_paths: List[str], model_name: str, output_dir
 
         video = ffmpeg.input(path)
         audio = video.audio
-
+        outt_path = translate_subtitle(srt_path, target_lang) if target_lang != "en" else srt_path
+        font_path = os.path.join(os.getcwd(), 'NotoSans-Regular.ttf')
         ffmpeg.concat(
-            video.filter('subtitles', srt_path, force_style="OutlineColour=&H40000000,BorderStyle=3"), audio, v=1, a=1
+            video.filter('subtitles', outt_path, force_style=f"FontName={font_path},OutlineColour=&H40000000,BorderStyle=3"), audio, v=1, a=1
         ).output(out_path).run(quiet=True, overwrite_output=True)
 
         st.write(f"Saved subtitled video to {os.path.abspath(out_path)}.")
@@ -96,7 +109,13 @@ def generate_subtitled_video(video_paths: List[str], model_name: str, output_dir
         st.video(out_path)
 
         # Display the download button
+        st.write(f"Click Below to download subbed video")
         st.markdown(download_file(out_path), unsafe_allow_html=True)
+        st.write(f"Click Below to download English SRT")
+        st.markdown(download_file(srt_path), unsafe_allow_html=True)
+        if target_lang != "en":
+            st.write(f"Click Below to download target SRT")
+            st.markdown(download_file(outt_path), unsafe_allow_html=True)
 
 
 def main():
@@ -116,7 +135,7 @@ def main():
     if video_paths is not None:
         for uploaded_file in video_paths:
             # Create a temporary file path
-            temp_file_path = os.path.join("/tmp", uploaded_file.name)
+            temp_file_path = os.path.join(os.getcwd(), 'uploads', uploaded_file.name)
 
             # Save the uploaded file data to the temporary file
             with open(temp_file_path, "wb") as f:
@@ -126,7 +145,7 @@ def main():
     # Download YouTube video if URL is provided
     if youtube_url:
         filename = download_video(youtube_url, selected_resolution)
-        video_full_paths.append(os.path.join("./uploads", filename))
+        video_full_paths.append(os.path.join(os.getcwd(), "uploads", filename))
 
     model_name = st.selectbox("Select model to use", whisper.available_models())
 
@@ -140,6 +159,10 @@ def main():
 
     task = st.selectbox("Select task", ["translate", "transcribe"])
 
+    language_dict = {"English":"en", "Telugu":"te","Hindi":"hi","Tamil":"te"}
+    target_lang = st.selectbox("Select target language for subtitles", list(language_dict.keys()))
+    target_lang = language_dict[target_lang]
+
     # Redirect stdout to the custom stream
     sys.stdout = StreamToSt(st)
 
@@ -152,7 +175,7 @@ def main():
         elif not output_dir:
             st.error("Please enter an output directory.")
         else:
-            generate_subtitled_video(video_full_paths, model_name, output_dir, output_srt, srt_only, verbose, task)
+            generate_subtitled_video(video_full_paths, model_name, output_dir, output_srt, srt_only, verbose, target_lang, task)
 
     sys.stdout = sys.__stdout__
 

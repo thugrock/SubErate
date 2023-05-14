@@ -2,6 +2,11 @@ import streamlit as st
 from transformers import MT5ForConditionalGeneration, MT5Tokenizer
 import pysrt
 import os
+from transformers import AutoProcessor, AutoModelForSpeechSeq2Seq
+
+processor = AutoProcessor.from_pretrained("nurenora/whisper-finetune-telugu")
+
+model = AutoModelForSpeechSeq2Seq.from_pretrained("nurenora/whisper-finetune-telugu")
 # Define the supported target languages
 LANGUAGES = {
     "Hindi": "hi",
@@ -13,7 +18,7 @@ LANGUAGES = {
 def translate_subtitle(subtitle_text, target_language):
     print(subtitle_text)
     # Load the model and tokenizer for the target language
-    model_name = "google/mt5-small"
+    model_name = "nurenora/whisper-finetune-telugu"
     tokenizer = MT5Tokenizer.from_pretrained(model_name)
     model = MT5ForConditionalGeneration.from_pretrained(model_name)
 
