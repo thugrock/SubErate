@@ -119,9 +119,10 @@ def generate_subtitled_video(video_paths: List[str], model_name: str, output_dir
 
 
 def main():
-    st.set_page_config(page_title="Subtitled Video Generator")
 
-    st.header("Subtitled Video Generator")
+    st.set_page_config(page_title="SubErate")
+
+    st.header("Subtitled Video Translator and Transcriber")
 
     # Create input box for YouTube URL
     youtube_url = st.text_input("Enter a YouTube URL:")
@@ -135,7 +136,7 @@ def main():
     if video_paths is not None:
         for uploaded_file in video_paths:
             # Create a temporary file path
-            temp_file_path = os.path.join(os.getcwd(), 'uploads')
+            temp_file_path = os.path.join(os.getcwd(), 'uploads', uploaded_file.name)
 
             # Save the uploaded file data to the temporary file
             with open(temp_file_path, "wb") as f:
