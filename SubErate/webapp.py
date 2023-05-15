@@ -10,6 +10,8 @@ import pytube
 import pysrt
 import time
 import io
+from translate import Translator
+import base64
 import sys
 from cli import get_audio, get_subtitles
 
